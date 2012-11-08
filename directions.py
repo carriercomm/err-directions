@@ -11,7 +11,7 @@ else:
     from errbot.jabberbot import botcmd
 
 from urllib import quote
-import simplejson
+import json
 from urllib2 import urlopen
 
 __author__ = 'atalyad'
@@ -68,7 +68,7 @@ class Directions(BotPlugin):
         url = DIRECTIONS_URL % (quote(A.encode('utf-8')), quote(B.encode('utf-8')), mode)
 
         content = urlopen(url)
-        results = simplejson.load(content)
+        results = json.load(content)
 
         if results['status'] != 'OK':
             return results['status']
