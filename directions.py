@@ -1,18 +1,15 @@
 import logging
 import re
 
-# Backward compatibility
-from errbot.version import VERSION
-from errbot.utils import version2array
-if version2array(VERSION) >= [1,6,0]:
-    from errbot import botcmd, BotPlugin
-else:
-    from errbot.botplugin import BotPlugin
-    from errbot.jabberbot import botcmd
+from errbot import botcmd, BotPlugin, PY2
 
-from urllib import quote
 import json
-from urllib2 import urlopen
+
+if PY2:
+    from urllib2 import urlopen
+    from urllib import quote
+else:
+    from urllib.request import urlopen, quote
 
 __author__ = 'atalyad'
 
@@ -38,7 +35,7 @@ class DirectionsBuilder(type):
 class Directions(BotPlugin):
     __metaclass__ = DirectionsBuilder
 
-    min_err_version = '1.4.1' # need a bug correction on the metaclasses generation
+    min_err_version = '1.6.1'  # need a bug correction on the metaclasses generation
 
     def generate_directions_str(self, json_res):
         remove_html_tags = re.compile(r'<.*?>')
@@ -68,7 +65,7 @@ class Directions(BotPlugin):
         url = DIRECTIONS_URL % (quote(A.encode('utf-8')), quote(B.encode('utf-8')), mode)
 
         content = urlopen(url)
-        results = json.load(content)
+        results = json.loads(content.read().decode())
 
         if results['status'] != 'OK':
             return results['status']
@@ -80,14 +77,10 @@ class Directions(BotPlugin):
             return 'Please supply an origin and a destination separated by a "->". like : Paris, France -> Marseille, France '
         return self.get_directions(args[0], args[1], mode)
 
-
     @botcmd(split_args_with='->')
-    def directions(self, mess, args):
+    def directions(self, _, args):
         """
         Returns the driving directions from origin to destination using Google directions api.
         !directions origin -> destination
         """
         return self.bare_directions(args)
-
-
-
