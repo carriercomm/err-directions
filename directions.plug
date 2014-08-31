@@ -1,6 +1,9 @@
 [Core]
-Name = DirectionsPlugin
+Name = Directions
 Module = directions
+
+[Python]
+Version = 2+
 
 [Documentation]
 Description = gives you the directions from a to b.
